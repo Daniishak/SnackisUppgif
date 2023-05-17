@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SnackisUppgift.Data;
 
@@ -11,9 +12,11 @@ using SnackisUppgift.Data;
 namespace SnackisUppgift.Migrations
 {
     [DbContext(typeof(SnackisUppgiftContext))]
-    partial class SnackisUppgiftContextModelSnapshot : ModelSnapshot
+    [Migration("20230517120029_newdatabase")]
+    partial class newdatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -259,10 +262,6 @@ namespace SnackisUppgift.Migrations
 
                     b.Property<int?>("Likes")
                         .HasColumnType("int");
-
-                    b.Property<string>("PostedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SubjectId")
                         .HasColumnType("int");
