@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Pages\Roles\" />
     <Folder Include="wwwroot\img\" />
   </ItemGroup>
 

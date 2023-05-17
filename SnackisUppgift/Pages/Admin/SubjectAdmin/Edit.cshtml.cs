@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,6 +13,7 @@ using SnackisUppgift.Models;
 
 namespace SnackisUppgift.Pages.Admin.SubjectAdmin
 {
+    [Authorize(Roles = "Owner, Admin")]
     public class EditModel : PageModel
     {
         private readonly SnackisUppgift.Data.SnackisUppgiftContext _context;

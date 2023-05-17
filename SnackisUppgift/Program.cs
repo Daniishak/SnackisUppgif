@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using SnackisUppgift.Areas.Identity.Data;
 using SnackisUppgift.Data;
 namespace SnackisUppgift
 {
@@ -12,12 +13,22 @@ namespace SnackisUppgift
 
    builder.Services.AddDbContext<SnackisUppgiftContext>(options => options.UseSqlServer(connectionString));
 
-			builder.Services.AddDefaultIdentity<Areas.Identity.Data.SnackisUppgiftUser>(options =>
-		  options.SignIn.RequireConfirmedAccount =
-		  true).AddEntityFrameworkStores<SnackisUppgiftContext>();
 
+			builder.Services.AddDefaultIdentity<SnackisUppgiftUser>(options => options.SignIn.RequireConfirmedAccount = true)
+			.AddRoles<IdentityRole>() //Lägg till roller här
+			.AddEntityFrameworkStores<SnackisUppgiftContext>();
+
+			builder.Services.AddAuthorization(options =>
+			{
+				options.AddPolicy("AdminKrav",
+					policy => policy.RequireRole("Admin"));
+			});
 			// Add services to the container.
-			builder.Services.AddRazorPages();
+			builder.Services.AddRazorPages(options =>
+			{
+				options.Conventions.AuthorizeFolder("/Secret");
+				options.Conventions.AuthorizeFolder("/Secret", "AdminKrav");
+			});
 
 			var app = builder.Build();
 
