@@ -31,7 +31,7 @@ namespace SnackisUppgift.Pages
 
 
 
-		public async Task<IActionResult> OnGetAsync(int deleteid, bool showForm = false)
+		public async Task<IActionResult> OnGetAsync(int? subjectId = null, int deleteid = 0, bool showForm = false)
 		{
 			ShowForm = showForm;
 			Subjects = await _context.Subject.ToListAsync();
@@ -60,14 +60,33 @@ namespace SnackisUppgift.Pages
 			}
 
 			// Sort posts in descending order based on the date
-			Posts = await _context.Post.OrderByDescending(p => p.Date).ToListAsync();
+			if (subjectId.HasValue)
+			{
+				Posts = await _context.Post
+					.Where(p => p.SubjectId == subjectId.Value)
+					.OrderByDescending(p => p.Date)
+					.ToListAsync();
+			}
+			else
+			{
+				Posts = await _context.Post
+					.OrderByDescending(p => p.Date)
+					.ToListAsync();
+			}
 
 			return Page();
 		}
 
+
 		public async Task<IActionResult> OnPostAsync()
         {
-            string filename = string.Empty;
+			if (!ModelState.IsValid)
+			{
+				// Reload subjects and return page to display validation errors.
+				Subjects = await _context.Subject.ToListAsync();
+				return Page();
+			}
+			string filename = string.Empty;
             if (UploadedImage != null)
             {
                 Random rnd = new();

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SnackisUppgift.Data;
 
@@ -11,9 +12,11 @@ using SnackisUppgift.Data;
 namespace SnackisUppgift.Migrations
 {
     [DbContext(typeof(SnackisUppgiftContext))]
-    partial class SnackisUppgiftContextModelSnapshot : ModelSnapshot
+    [Migration("20230518113833_GeDatabasen")]
+    partial class GeDatabasen
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -281,7 +284,7 @@ namespace SnackisUppgift.Migrations
                     b.Property<int?>("Comments")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Date")
+                    b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
@@ -289,15 +292,17 @@ namespace SnackisUppgift.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("Likes")
                         .HasColumnType("int");
 
                     b.Property<string>("PostedBy")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SubjectId")
+                    b.Property<int?>("SubjectId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
@@ -403,9 +408,7 @@ namespace SnackisUppgift.Migrations
                 {
                     b.HasOne("SnackisUppgift.Models.Subject", "Subject")
                         .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SubjectId");
 
                     b.Navigation("Subject");
                 });

@@ -65,6 +65,21 @@ else
 {
 	<div class="alert alert-danger">Du är INTE inloggad </div>
 }
+<div class="row">
+	<div class="col-md-3">
+		<div class="list-group">
+			@foreach (var subject in Model.Subjects)
+			{
+				<a asp-route-subjectId="@subject.Id" class="list-group-item list-group-item-action">
+					@subject.Category
+				</a>
+			}
+		</div>
+	</div>
+	<div class="col-md-9">
+		<!-- Your post content here -->
+	</div>
+</div>
 
 <div class="d-flex justify-content-center flex-wrap">
 	@if (Model.Posts != null)
@@ -80,6 +95,7 @@ else
 					</div>
 					<h5 class="card-title">@post.Title</h5>
 					<p class="card-text">@post.Description</p>
+					<p class="card-footer">@post.Subject?.Category</p>
 					@if (User.Identity.Name != null && User.Identity.Name == post.UserName)
 					{
 						<a asp-route-deleteid="@post.Id" class="btn btn-primary">Ta bort</a>

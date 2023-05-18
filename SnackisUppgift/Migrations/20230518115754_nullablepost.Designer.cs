@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SnackisUppgift.Data;
 
@@ -11,9 +12,11 @@ using SnackisUppgift.Data;
 namespace SnackisUppgift.Migrations
 {
     [DbContext(typeof(SnackisUppgiftContext))]
-    partial class SnackisUppgiftContextModelSnapshot : ModelSnapshot
+    [Migration("20230518115754_nullablepost")]
+    partial class nullablepost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -285,7 +288,6 @@ namespace SnackisUppgift.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
@@ -297,11 +299,10 @@ namespace SnackisUppgift.Migrations
                     b.Property<string>("PostedBy")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("SubjectId")
+                    b.Property<int?>("SubjectId")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
@@ -403,9 +404,7 @@ namespace SnackisUppgift.Migrations
                 {
                     b.HasOne("SnackisUppgift.Models.Subject", "Subject")
                         .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SubjectId");
 
                     b.Navigation("Subject");
                 });
