@@ -101,5 +101,35 @@ namespace SnackisUppgift.Pages
             ShowForm = !showForm;
             return RedirectToPage(new { ShowForm });
         }
-    }
+		public async Task<IActionResult> OnPostSendDMAsync(string receiverEmail, string dmContent)
+		{
+			// Find the receiver by their email
+			var receiver = await _userManager.FindByEmailAsync(receiverEmail);
+			if (receiver == null)
+			{
+				ModelState.AddModelError("", "No user with that email found");
+				return Page();
+			}
+
+			// Get the sender's ID
+			var senderId = _userManager.GetUserId(User);
+
+			// Create a new DM
+			var dm = new DirectMessage
+			{
+				SenderId = senderId,
+				ReceiverId = receiver.Id,
+				Message = dmContent,
+				SentAt = DateTime.UtcNow
+			};
+
+			_context.DirectMessages.Add(dm);
+			await _context.SaveChangesAsync();
+
+			// TODO: send a notification to the receiver
+
+			return RedirectToPage();
+		}
+
+	}
 }

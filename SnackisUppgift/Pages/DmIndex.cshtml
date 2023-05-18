@@ -1,0 +1,21 @@
+﻿@page
+@model SnackisUppgift.Pages.DmIndexModel
+
+<div class="container">
+    <h1>Your Direct Messages</h1>
+
+    @foreach (var dm in Model.DirectMessages)
+    {
+        <div class="card">
+            <div class="card-header">
+                From: @dm.SenderId  <!-- Replace with sender's email or name -->
+                To: @dm.ReceiverId <!-- Replace with receiver's email or name -->
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">@dm.Subject</h5>
+                <p class="card-text">@dm.Message</p>
+                <p class="card-text"><small class="text-muted">Sent: @dm.SentAt</small></p>
+            </div>
+        </div>
+    }
+</div>

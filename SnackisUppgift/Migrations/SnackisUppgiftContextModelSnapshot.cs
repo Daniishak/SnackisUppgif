@@ -235,6 +235,45 @@ namespace SnackisUppgift.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("SnackisUppgift.Models.DirectMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReadAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("DirectMessages", (string)null);
+                });
+
             modelBuilder.Entity("SnackisUppgift.Models.Post", b =>
                 {
                     b.Property<int>("Id")
@@ -278,7 +317,7 @@ namespace SnackisUppgift.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("Post");
+                    b.ToTable("Post", (string)null);
                 });
 
             modelBuilder.Entity("SnackisUppgift.Models.Subject", b =>
@@ -295,7 +334,7 @@ namespace SnackisUppgift.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subject");
+                    b.ToTable("Subject", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -349,6 +388,25 @@ namespace SnackisUppgift.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SnackisUppgift.Models.DirectMessage", b =>
+                {
+                    b.HasOne("SnackisUppgift.Areas.Identity.Data.SnackisUppgiftUser", "Receiver")
+                        .WithMany("MessagesReceived")
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SnackisUppgift.Areas.Identity.Data.SnackisUppgiftUser", "Sender")
+                        .WithMany("MessagesSent")
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("SnackisUppgift.Models.Post", b =>
                 {
                     b.HasOne("SnackisUppgift.Models.Subject", "Subject")
@@ -356,6 +414,13 @@ namespace SnackisUppgift.Migrations
                         .HasForeignKey("SubjectId");
 
                     b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("SnackisUppgift.Areas.Identity.Data.SnackisUppgiftUser", b =>
+                {
+                    b.Navigation("MessagesReceived");
+
+                    b.Navigation("MessagesSent");
                 });
 #pragma warning restore 612, 618
         }
