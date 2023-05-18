@@ -8,7 +8,7 @@ using System.Data;
 
 namespace SnackisUppgift.Pages.Roles
 {
-    [Authorize(Roles = "Owner")]
+    //[Authorize(Roles = "Owner")]
     public class IndexModel : PageModel
 	{
 		public List<SnackisUppgiftUser> Users { get; set; }

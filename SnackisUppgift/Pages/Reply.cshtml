@@ -1,0 +1,14 @@
+﻿@page "/Reply/{id}"
+@model SnackisUppgift.Pages.ReplyModel
+
+<h1>Reply to Message</h1>
+
+<p>@Model.OriginalMessage.Message</p>
+
+<form method="post">
+    <div class="form-group">
+        <label for="replyContent">Your Reply</label>
+        <textarea id="replyContent" name="replyContent" class="form-control"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Send Reply</button>
+</form>
