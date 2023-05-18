@@ -29,6 +29,17 @@ namespace SnackisUppgift.Pages
             var userId = _userManager.GetUserId(User);
             DirectMessages = await _context.DirectMessages
                 .Where(dm => dm.ReceiverId == userId || dm.SenderId == userId)
+                .Select(dm => new DirectMessage
+                {
+                    Id = dm.Id,
+                    SenderId = dm.SenderId,
+                    ReceiverId = dm.ReceiverId,
+                    Sender = _context.Users.FirstOrDefault(u => u.Id == dm.SenderId),
+                    Receiver = _context.Users.FirstOrDefault(u => u.Id == dm.ReceiverId),
+                    Subject = dm.Subject,
+                    Message = dm.Message,
+                    SentAt = dm.SentAt
+                })
                 .ToListAsync();
         }
 
