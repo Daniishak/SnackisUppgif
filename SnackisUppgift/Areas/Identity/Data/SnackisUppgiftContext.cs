@@ -12,7 +12,7 @@ public class SnackisUppgiftContext : IdentityDbContext<SnackisUppgiftUser>
         : base(options)
     {
     }
-    public DbSet<DirectMessage> DirectMessages { get; set; }
+	public DbSet<DirectMessage> DirectMessages { get; set; } = default!;
     public DbSet<SnackisUppgift.Models.Post> Post { get; set; } = default!;
     public DbSet<SnackisUppgift.Models.Subject> Subject { get; set; } = default!;
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
