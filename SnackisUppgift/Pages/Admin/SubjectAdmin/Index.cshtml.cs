@@ -15,9 +15,9 @@ namespace SnackisUppgift.Pages.Admin.SubjectAdmin
     [Authorize(Roles = "Owner, Admin")]
     public class IndexModel : PageModel
     {
-        private readonly SnackisUppgift.Data.SnackisUppgiftContext _context;
+        private readonly SnackisUppgift.DAL.SubjectManagerAPI _context;
 
-        public IndexModel(SnackisUppgift.Data.SnackisUppgiftContext context)
+        public IndexModel(SnackisUppgift.DAL.SubjectManagerAPI context)
         {
             _context = context;
         }

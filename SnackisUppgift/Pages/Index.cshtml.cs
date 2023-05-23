@@ -19,7 +19,9 @@ namespace SnackisUppgift.Pages
             _userManager = userManager;
         }
         public List<Subject> Subjects { get; set; }
-        public List<Models.Post> Posts { get; set; }
+
+		public Models.Subject Subject { get; set; }
+		public List<Models.Post> Posts { get; set; }
 
         [BindProperty]
         public Models.Post Post { get; set; }
@@ -31,10 +33,15 @@ namespace SnackisUppgift.Pages
 
 
 
-		public async Task<IActionResult> OnGetAsync(int? subjectId = null, int deleteid = 0, bool showForm = false)
+		public async Task<IActionResult> OnGetAsync(int subjectId = 0, int deleteid = 0, bool showForm = false)
 		{
 			ShowForm = showForm;
-			Subjects = await _context.Subject.ToListAsync();
+			Subjects = await DAL.SubjectManagerAPI.GetAllSubjects();
+
+			if (subjectId != 0 || subjectId != null)
+			{
+				Subject = await DAL.SubjectManagerAPI.GetSubject(subjectId);
+			}
 
 			// Get the logged in user
 			string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -60,10 +67,10 @@ namespace SnackisUppgift.Pages
 			}
 
 			// Sort posts in descending order based on the date
-			if (subjectId.HasValue)
+			if (subjectId != 0)
 			{
 				Posts = await _context.Post
-					.Where(p => p.SubjectId == subjectId.Value)
+					.Where(p => p.SubjectId == subjectId)
 					.OrderByDescending(p => p.Date)
 					.ToListAsync();
 			}
@@ -76,6 +83,8 @@ namespace SnackisUppgift.Pages
 
 			return Page();
 		}
+
+
 
 
 		public async Task<IActionResult> OnPostAsync()
