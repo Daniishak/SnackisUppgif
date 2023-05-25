@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,35 +9,33 @@ using SnackisUppgift.Models;
 
 namespace SnackisUppgift.Pages.Admin.SubjectAdmin
 {
-    [Authorize(Roles = "Owner, Admin")]
-    public class DetailsModel : PageModel
-    {
-        private readonly SnackisUppgift.Data.SnackisUppgiftContext _context;
+	[Authorize(Roles = "Owner, Admin")]
+	public class DetailsModel : PageModel
+	{
+		private readonly SnackisUppgiftContext _context;
 
-        public DetailsModel(SnackisUppgift.Data.SnackisUppgiftContext context)
-        {
-            _context = context;
-        }
+		public DetailsModel(SnackisUppgiftContext context)
+		{
+			_context = context;
+		}
 
-      public Subject Subject { get; set; } = default!; 
+		public Subject Subject { get; set; }
 
-        public async Task<IActionResult> OnGetAsync(int? id)
-        {
-            if (id == null || _context.Subject == null)
-            {
-                return NotFound();
-            }
+		public async Task<IActionResult> OnGetAsync(int? id)
+		{
+			if (id == null)
+			{
+				return NotFound();
+			}
 
-            var subject = await _context.Subject.FirstOrDefaultAsync(m => m.Id == id);
-            if (subject == null)
-            {
-                return NotFound();
-            }
-            else 
-            {
-                Subject = subject;
-            }
-            return Page();
-        }
-    }
+			Subject = await _context.Subject.FirstOrDefaultAsync(m => m.Id == id);
+
+			if (Subject == null)
+			{
+				return NotFound();
+			}
+
+			return Page();
+		}
+	}
 }

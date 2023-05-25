@@ -1,49 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using SnackisUppgift.Data;
 using SnackisUppgift.Models;
+using SnackisUppgift.DAL;  
 
 namespace SnackisUppgift.Pages.Admin.SubjectAdmin
 {
-    [Authorize(Roles = "Owner, Admin")]
-    public class CreateModel : PageModel
-    {
+	[Authorize(Roles = "Owner, Admin")]
+	public class CreateModel : PageModel
+	{
+		[BindProperty]
+		public Subject Subject { get; set; } = default!;
 
-        private readonly SnackisUppgift.Data.SnackisUppgiftContext _context;
+		public IActionResult OnGet()
+		{
+			return Page();
+		}
 
-        public CreateModel(SnackisUppgift.Data.SnackisUppgiftContext context)
-        {
-            _context = context;
-        }
+		// To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
+		public async Task<IActionResult> OnPostAsync()
+		{
+			if (!ModelState.IsValid)
+			{
+				return Page();
+			}
 
-        public IActionResult OnGet()
-        {
-            return Page();
-        }
+			// Use the SaveSubject method from the SubjectManagerAPI to save the new subject
+			await SubjectManagerAPI.SaveSubject(Subject);
 
-        [BindProperty]
-        public Subject Subject { get; set; } = default!;
-        
-
-        // To protect from overposting attacks, see https://aka.ms/RazorPagesCRUD
-        public async Task<IActionResult> OnPostAsync()
-        {
-          if (!ModelState.IsValid || _context.Subject == null || Subject == null)
-            {
-                return Page();
-            }
-
-            _context.Subject.Add(Subject);
-            await _context.SaveChangesAsync();
-
-            return RedirectToPage("./Index");
-        }
-    }
+			return RedirectToPage("./Index");
+		}
+	}
 }

@@ -48,27 +48,40 @@ namespace SnackisUppgift.DAL
 		public static async Task SaveSubject(Models.Subject subject)
 		{
 			var prod = (await GetAllSubjects()).Where(p => p.Id == subject.Id).FirstOrDefault();
-			if (prod != null)
+			using (var client = new HttpClient())
 			{
-				using (var client = new HttpClient())
-				{
-					client.BaseAddress = BaseAddress;
-					var json = JsonSerializer.Serialize(subject);
-					StringContent httpContent = new StringContent(json, System.Text.Encoding.UTF8, "applicationU/json");
-					HttpResponseMessage response = await client.PostAsync("api/Subject/", httpContent);
-				}
-			}
-			else
-			{
-				using (var client = new HttpClient())
-				{
-					client.BaseAddress = BaseAddress;
+				client.BaseAddress = BaseAddress;
+				var json = JsonSerializer.Serialize(subject);
+				StringContent httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
-					var json = JsonSerializer.Serialize(subject);
-					StringContent httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+				// If the subject exists, update the subject using PutAsync method
+				if (prod != null)
+				{
+					HttpResponseMessage response = await client.PutAsync("api/Subject/" + subject.Id, httpContent);
+				}
+				// If the subject doesn't exist, create a new subject using PostAsync method
+				else
+				{
 					HttpResponseMessage response = await client.PostAsync("api/Subject/", httpContent);
 				}
 			}
 		}
+
+		public static async Task UpdateSubject(Models.Subject subject)
+		{
+			using (var client = new HttpClient())
+			{
+				client.BaseAddress = BaseAddress;
+
+				// Convert subject object to JSON
+				var json = JsonSerializer.Serialize(subject);
+				StringContent httpContent = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+				// Send a PUT request to your API endpoint
+				HttpResponseMessage response = await client.PutAsync("api/Subject/" + subject.Id, httpContent);
+			}
+		}
+
+
 	}
 }
