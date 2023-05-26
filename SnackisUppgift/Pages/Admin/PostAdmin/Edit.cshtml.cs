@@ -39,7 +39,7 @@ namespace SnackisUppgift.Pages.Admin.PostAdmin
                 return NotFound();
             }
             Post = post;
-           ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Id");
+           ViewData["SubjectId"] = new SelectList(_context.Subjects, "Id", "Id");
             return Page();
         }
 

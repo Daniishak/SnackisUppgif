@@ -1,109 +1,129 @@
 ﻿@page
 @model IndexModel
 @{
-	ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
+<style>
+    .card-img-container {
+        height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
 
-	@if (Model.MyUser != null)
-	{
-		<h1 class="display-4">Välkommen @Model.MyUser.FirstName @Model.MyUser.LastName</h1>
-	}
+        .card-img-container img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+        }
+</style>
+
+<div class="text-center">
+    @if (Model.MyUser != null)
+    {
+        <h1 class="display-4">Välkommen @Model.MyUser.FirstName @Model.MyUser.LastName</h1>
+    }
 </div>
 
 @if (User.Identity.IsAuthenticated)
 {
-	<p>Du är ingloggad som @User.Identity.Name</p>
-	<form method="post" asp-page-handler="ToggleForm">
-		<input type="hidden" name="showForm" value="@Model.ShowForm" />
-		<button type="submit" class="btn btn-primary">
-			<i class="fas fa-plus-circle"></i>
-		</button>
-	</form>
-	@if (Model.ShowForm)
-	{
-		<form method="post" enctype="multipart/form-data">
-			<div class="form-group">
-				<label asp-for="@Model.Post.Title" class="form-label"></label>
-				<input asp-for="Post.Title" class="form-control">
-				<span asp-validation-for="Post.Title" class="text-danger"></span>
-			</div>
+    <p>Du är ingloggad som @User.Identity.Name</p>
+    <form method="post" asp-page-handler="ToggleForm">
+        <input type="hidden" name="showForm" value="@Model.ShowForm" />
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i>
+        </button>
+    </form>
+    @if (Model.ShowForm)
+    {
+        <form method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label asp-for="@Model.Post.Title" class="form-label"></label>
+                <input asp-for="Post.Title" class="form-control">
+                <span asp-validation-for="Post.Title" class="text-danger"></span>
+            </div>
 
-			<div class="form-group">
-				<label asp-for="Post.Description" class="form.label"></label>
-				<textarea asp-for="Post.Description" class="form-control" cols="40" rows="5"></textarea>
-				<span asp-validation-for="Post.Description" class="text-danger"></span>
-			</div>
+            <div class="form-group">
+                <label asp-for="Post.Description" class="form.label"></label>
+                <textarea asp-for="Post.Description" class="form-control" cols="40" rows="5"></textarea>
+                <span asp-validation-for="Post.Description" class="text-danger"></span>
+            </div>
 
-			<div class="form-group">
-				<label asp-for="Post.SubjectId" class="form-label"></label>
-				<select asp-for="Post.SubjectId" class="form-control" asp-items="@(new SelectList(Model.Subjects, "Id", "Category"))">
-					<option value="">Välj ämne</option>
-				</select>
-			</div>
-			<div class="form-group form-check">
-				<input asp-for="IsAnonymous" type="checkbox" class="form-check-input" id="anonymousCheck">
-				<label asp-for="IsAnonymous" class="form-check-label">Posta som anonym</label>
-			</div>
+            <div class="form-group">
+                <label asp-for="Post.SubjectId" class="form-label"></label>
+                <select asp-for="Post.SubjectId" class="form-control" asp-items="@(new SelectList(Model.Subjects, "Id", "Category"))">
+                    <option value="">Välj ämne</option>
+                </select>
+            </div>
+            <div class="form-group form-check">
+                <input asp-for="IsAnonymous" type="checkbox" class="form-check-input" id="anonymousCheck">
+                <label asp-for="IsAnonymous" class="form-check-label">Posta som anonym</label>
+            </div>
 
+            <div class="form-group">
+                <label asp-for="Post.Image" class="form-label"></label>
+                <input type="file" class="form-control" name="UploadedImage">
+            </div>
 
-
-			<div class="form-group">
-				<label asp-for="Post.Image" class="form-label"></label>
-				<input type="file" class="form-control" name="UploadedImage">
-			</div>
-
-
-			<input type="submit" class="btn btn-success" value="Spara Inlägg">
-		</form>
-	}
-
+            <input type="submit" class="btn btn-success" value="Spara Inlägg">
+        </form>
+    }
 }
-
 else
 {
-	<div class="alert alert-danger">Du är INTE inloggad </div>
+    <div class="alert alert-danger">Du är INTE inloggad </div>
 }
+
 <div class="row">
-	<div class="col-md-3">
-		<div class="list-group">
-			@foreach (var subject in Model.Subjects)
-			{
-				<a asp-route-subjectId="@subject.Id" class="list-group-item list-group-item-action">
-					@subject.Category
-				</a>
-			}
-		</div>
-	</div>
-	<div class="col-md-9">
-		<!-- Your post content here -->
-	</div>
+    <div class="col-md-3">
+        <div class="list-group">
+            @foreach (var subject in Model.Subjects)
+            {
+                <a asp-route-subjectId="@subject.Id" class="list-group-item list-group-item-action">
+                    @subject.Category
+                </a>
+            }
+        </div>
+    </div>
+    <div class="col-md-9">
+        <!-- Your post content here -->
+    </div>
 </div>
 
 <div class="d-flex justify-content-center flex-wrap">
-	@if (Model.Posts != null)
-{
-		@foreach (var post in Model.Posts)
-		{
-			<div class="card m-2" style="max-width: 50%">
-				<img class="card-img-top" src="~/img/@post.Image">
-				<div class="card-body">
-					<div class="card-header-info d-flex justify-content-between align-items-center">
-						<p class="mb-0">@(!string.IsNullOrEmpty(post.PostedBy) ? post.PostedBy : "Anonym")</p>
-						<p class="mb-0">@post.Date</p>
-					</div>
-					<h5 class="card-title">@post.Title</h5>
-					<p class="card-text">@post.Description</p>
-					<p class="card-footer">@post.Subject?.Category</p>
-					@if (User.Identity.Name != null && User.Identity.Name == post.UserName)
-					{
-						<a asp-route-deleteid="@post.Id" class="btn btn-primary">Ta bort</a>
-					}
-				</div>
-			</div>
-		}
-}
+    @if (Model.Posts != null)
+    {
+        @foreach (var post in Model.Posts)
+        {
+            <div class="card m-2" style="width: 60vw; max-width: 100%;">
+                <div class="card-img-container">
+                    <img class="card-img-top" src="~/img/@post.Image">
+                </div>
+                <div class="card-body">
+                    <div class="card-header-info d-flex justify-content-between align-items-center">
+                        <p class="mb-0">@(!string.IsNullOrEmpty(post.PostedBy) ? post.PostedBy : "Anonym")</p>
+                        <p class="mb-0">@post.Date</p>
+                    </div>
+                    <h5 class="card-title">@post.Title</h5>
+                    <p class="card-text">@post.Description</p>
+                    <div class="card-footer">
+                        <div class="d-flex justify-content-between">
+                            <form method="post" asp-page-handler="Like" asp-route-postId="@post.Id">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="far fa-thumbs-up"></i> Like
+                                </button>
+                            </form>
+                            <span>@post.Likes</span>
+                        </div>
+                    </div>
+                    @if (User.Identity.Name != null && User.Identity.Name == post.UserName)
+                    {
+                        <a asp-route-deleteid="@post.Id" class="btn btn-primary">Ta bort</a>
+                    }
+                </div>
+            </div>
+        }
+    }
 </div>
-
-

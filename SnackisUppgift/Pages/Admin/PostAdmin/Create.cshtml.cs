@@ -24,7 +24,7 @@ namespace SnackisUppgift.Pages.Admin.PostAdmin
 
         public IActionResult OnGet()
         {
-        ViewData["SubjectId"] = new SelectList(_context.Subject, "Id", "Category");
+        ViewData["SubjectId"] = new SelectList(_context.Subjects, "Id", "Category");
             return Page();
         }
 

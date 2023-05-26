@@ -36,9 +36,9 @@ namespace SnackisUppgift.Pages
 		public async Task<IActionResult> OnGetAsync(int subjectId = 0, int deleteid = 0, bool showForm = false)
 		{
 			ShowForm = showForm;
-			Subjects = await DAL.SubjectManagerAPI.GetAllSubjects();
+            Subjects = await DAL.SubjectManagerAPI.GetAllSubjects();
 
-			if (subjectId != 0 || subjectId != null)
+            if (subjectId != 0 || subjectId != null)
 			{
 				Subject = await DAL.SubjectManagerAPI.GetSubject(subjectId);
 			}
@@ -92,7 +92,7 @@ namespace SnackisUppgift.Pages
 			if (!ModelState.IsValid)
 			{
 				// Reload subjects and return page to display validation errors.
-				Subjects = await _context.Subject.ToListAsync();
+		//	Subjects = await _context.Subjects.ToListAsync();
 				return Page();
 			}
 			string filename = string.Empty;
@@ -116,7 +116,8 @@ namespace SnackisUppgift.Pages
             }
             else
             {
-                Post.UserName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                Post.UserName = user.UserName;
             }
 
             _context.Add(Post);
@@ -129,6 +130,20 @@ namespace SnackisUppgift.Pages
             ShowForm = !showForm;
             return RedirectToPage(new { ShowForm });
         }
+		public async Task<IActionResult> OnPostLikeAsync(int postId)
+{
+    var post = await _context.Post.FindAsync(postId);
+    if (post == null)
+    {
+        return NotFound();
+    }
+
+    post.Likes++; // Increment the likes count
+    await _context.SaveChangesAsync();
+
+    return new JsonResult(new { likes = post.Likes });
+}
+
 		
 
 	}

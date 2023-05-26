@@ -28,7 +28,7 @@ namespace SnackisUppgift.Pages.Admin.SubjectAdmin
 				return NotFound();
 			}
 
-			Subject = await _context.Subject.FirstOrDefaultAsync(m => m.Id == id);
+			Subject = await _context.Subjects.FirstOrDefaultAsync(m => m.Id == id);
 
 			if (Subject == null)
 			{
