@@ -31,12 +31,15 @@ namespace SnackisUppgift.Areas.Identity.Pages.Account
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
+        private readonly IWebHostEnvironment _environment;
+
         public RegisterModel(
             UserManager<SnackisUppgiftUser> userManager,
             IUserStore<SnackisUppgiftUser> userStore,
             SignInManager<SnackisUppgiftUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IWebHostEnvironment environment) // Add this line
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -44,9 +47,11 @@ namespace SnackisUppgift.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _environment = environment; // Add this line
         }
 
-        
+
+
 
 
         /// <summary>
@@ -83,6 +88,8 @@ namespace SnackisUppgift.Areas.Identity.Pages.Account
             [Display(Name = "Email")]
             public string Email { get; set; }
 
+            [Display(Name = "Profilbild")]
+            public IFormFile ProfilePicture { get; set; }
             [Required]
             [Display(Name = "Förnamn")]
             public string FirstName { get; set; }
@@ -136,9 +143,32 @@ namespace SnackisUppgift.Areas.Identity.Pages.Account
                     Email = Input.Email,
                     FirstName = Input.FirstName,
                     LastName = Input.LastName,
-                    Birthyear = Input.Birthyear
-                };  
+                    Birthyear = Input.Birthyear,
+                    
 
+                };
+
+
+                if (Input.ProfilePicture != null)
+                {
+                    var fileName = $"{Guid.NewGuid()}_{Input.ProfilePicture.FileName}";
+                    var fileDirectory = Path.Combine(_environment.WebRootPath, "Images");
+
+                    // Check if the directory exists, if not, create it.
+                    if (!Directory.Exists(fileDirectory))
+                    {
+                        Directory.CreateDirectory(fileDirectory);
+                    }
+
+                    var filePath = Path.Combine(fileDirectory, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await Input.ProfilePicture.CopyToAsync(stream);
+                    }
+
+                    user.ProfilePicture = fileName; // Save the name of the file into user data.
+                }
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);

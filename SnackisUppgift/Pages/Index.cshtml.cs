@@ -18,6 +18,8 @@ namespace SnackisUppgift.Pages
             _context = context;
             _userManager = userManager;
         }
+        public string ProfilePicture { get; set; }
+
         public List<Subject> Subjects { get; set; }
 
 		public Models.Subject Subject { get; set; }
@@ -50,24 +52,39 @@ namespace SnackisUppgift.Pages
 				MyUser = await _userManager.FindByIdAsync(userId);
 			}
 
-			if (deleteid != 0)
-			{
-				Models.Post blog = await _context.Post.FindAsync(deleteid);
+            if (deleteid != 0)
+            {
+                Models.Post blog = await _context.Post.FindAsync(deleteid);
 
-				if (blog != null)
-				{
-					if (System.IO.File.Exists("./wwwroot/img/" + blog.Image))
-					{
-						System.IO.File.Delete("./wwwroot/img/" + blog.Image);
-					}
-					_context.Post.Remove(blog);
-					await _context.SaveChangesAsync();
-					return RedirectToPage("./Index");
-				}
-			}
+                if (blog != null)
+                {
+                    // Get the current user
+                    var currentUser = await _userManager.GetUserAsync(User);
 
-			// Sort posts in descending order based on the date
-			if (subjectId != 0)
+                    // Check if the current user is either an admin or the owner of the post
+                    if (User.IsInRole("Admin") || blog.UserName == currentUser.UserName ||User.IsInRole("Owner"))
+                    {
+                        if (System.IO.File.Exists("./wwwroot/img/" + blog.Image))
+                        {
+                            System.IO.File.Delete("./wwwroot/img/" + blog.Image);
+                        }
+                        _context.Post.Remove(blog);
+                        await _context.SaveChangesAsync();
+                        return RedirectToPage("./Index");
+                    }
+                    else
+                    {
+                        // If the current user is not authorized to delete the post, you can handle this however you like.
+                        // For example, you can redirect them to the homepage and display an error message.
+                        TempData["ErrorMessage"] = "You are not authorized to delete this post.";
+                        return RedirectToPage("./Index");
+                    }
+                }
+            }
+
+
+            // Sort posts in descending order based on the date
+            if (subjectId != 0)
 			{
 				Posts = await _context.Post
 					.Where(p => p.SubjectId == subjectId)
@@ -87,15 +104,16 @@ namespace SnackisUppgift.Pages
 
 
 		[HttpPost]
-		public async Task<IActionResult> OnPostAsync()
+        [HttpPost]
+        public async Task<IActionResult> OnPostAsync()
         {
-			if (!ModelState.IsValid)
-			{
-				// Reload subjects and return page to display validation errors.
-		//	Subjects = await _context.Subjects.ToListAsync();
-				return Page();
-			}
-			string filename = string.Empty;
+            if (!ModelState.IsValid)
+            {
+                // Reload subjects and return page to display validation errors.
+                return Page();
+            }
+
+            string filename = string.Empty;
             if (UploadedImage != null)
             {
                 Random rnd = new();
@@ -106,7 +124,6 @@ namespace SnackisUppgift.Pages
                     await UploadedImage.CopyToAsync(filestream);
                 }
             }
-
 
             Post.Date = DateTime.Now;
             Post.Image = filename;
@@ -119,6 +136,7 @@ namespace SnackisUppgift.Pages
             {
                 var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 Post.UserName = user.UserName;
+                ProfilePicture = user.ProfilePicture; // Add this line
             }
 
             _context.Add(Post);
@@ -126,6 +144,7 @@ namespace SnackisUppgift.Pages
 
             return RedirectToPage("./Index");
         }
+
         public IActionResult OnPostToggleForm(bool showForm)
         {
             ShowForm = !showForm;

@@ -4,11 +4,13 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Encodings.Web;
+using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Hosting;
 using SnackisUppgift.Areas.Identity.Data;
 
 namespace SnackisUppgift.Areas.Identity.Pages.Account.Manage
@@ -17,56 +19,41 @@ namespace SnackisUppgift.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<SnackisUppgiftUser> _userManager;
         private readonly SignInManager<SnackisUppgiftUser> _signInManager;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         public IndexModel(
             UserManager<SnackisUppgiftUser> userManager,
-            SignInManager<SnackisUppgiftUser> signInManager)
+            SignInManager<SnackisUppgiftUser> signInManager,
+            IWebHostEnvironment hostEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _hostEnvironment = hostEnvironment;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        public string ProfilePicture { get; set; }
         [TempData]
         public string StatusMessage { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            public IFormFile ProfilePicture { get; set; }
         }
 
+        // Method to load the user data
         private async Task LoadAsync(SnackisUppgiftUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
 
             Username = userName;
+            ProfilePicture = user.ProfilePicture;  // Load Profile Picture
 
             Input = new InputModel
             {
@@ -98,6 +85,19 @@ namespace SnackisUppgift.Areas.Identity.Pages.Account.Manage
             {
                 await LoadAsync(user);
                 return Page();
+            }
+
+            // Save profile picture
+            if (Input.ProfilePicture != null)
+            {
+                var filePath = Path.Combine(_hostEnvironment.WebRootPath, "Images", Input.ProfilePicture.FileName);
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await Input.ProfilePicture.CopyToAsync(stream);
+                }
+
+                user.ProfilePicture = "/Images/" + Input.ProfilePicture.FileName;
+                await _userManager.UpdateAsync(user);
             }
 
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);

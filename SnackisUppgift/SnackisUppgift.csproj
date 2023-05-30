@@ -20,6 +20,7 @@
   <ItemGroup>
     <Folder Include="Pages\Roles\" />
     <Folder Include="wwwroot\img\" />
+    <Folder Include="wwwroot\Images\" />
   </ItemGroup>
 
 </Project>

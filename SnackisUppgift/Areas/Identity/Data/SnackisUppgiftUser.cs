@@ -19,8 +19,10 @@ public class SnackisUppgiftUser : IdentityUser
 
 	[PersonalData]
 	public string LastName { get; set; }
+    public string? ProfilePicture { get; set; }
 
-	public ICollection<DirectMessage> MessagesSent { get; set; } = new List<DirectMessage>();
+
+    public ICollection<DirectMessage> MessagesSent { get; set; } = new List<DirectMessage>();
 	public ICollection<DirectMessage> MessagesReceived { get; set; } = new List<DirectMessage>();
 }
 

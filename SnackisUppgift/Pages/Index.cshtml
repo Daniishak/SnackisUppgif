@@ -111,9 +111,17 @@ else
 
                 <div class="card-body">
                     <div class="card-header-info d-flex justify-content-between align-items-center">
-                        <p class="mb-0">@(!string.IsNullOrEmpty(post.PostedBy) ? post.PostedBy : "Anonym")</p>
+                        <div class="d-flex align-items-center">
+                            <img src="@Model.MyUser.ProfilePicture" onerror="if (this.src != 'error.jpg') this.src = '/images/default_profile_picture.jpg';" alt="Profile picture" style="width:40px;height:40px;border-radius:50%;">
+                            <p class="mb-0 ml-2">@(!string.IsNullOrEmpty(post.PostedBy) ? post.PostedBy : "Anonym")</p>
+                        </div>
                         <p class="mb-0">@post.Date</p>
                     </div>
+
+@*                    <div class="card-header-info d-flex justify-content-between align-items-center">
+                        <p class="mb-0">@(!string.IsNullOrEmpty(post.PostedBy) ? post.PostedBy : "Anonym")</p>
+                        <p class="mb-0">@post.Date</p>
+                    </div>*@
                     <h5 class="card-title">@post.Title</h5>
                     <p class="card-text">@post.Description</p>
                     <div class="card-footer">
@@ -126,10 +134,11 @@ else
                             <span>@post.Likes</span>
                         </div>
                     </div>
-                    @if (User.Identity.Name != null && User.Identity.Name == post.UserName)
+                    @if (User.Identity.Name != null && (User.Identity.Name == post.UserName || User.IsInRole("Admin")) || User.IsInRole("Owner"))
                     {
                         <a asp-route-deleteid="@post.Id" class="btn btn-primary">Ta bort</a>
                     }
+
                 </div>
             </div>
         }
