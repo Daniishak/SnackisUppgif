@@ -28,9 +28,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Post[0].Description)
             </th>
-            <th>
+@*            <th>
                 @Html.DisplayNameFor(model => model.Post[0].Subject)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.Post[0].Date)
             </th>
@@ -58,10 +58,10 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
-            <td>
+@*            <td>
                     @Html.DisplayFor(modelItem => item.Subject.Category)
                     (@Html.DisplayFor(modelItem => item.Subject.Id)) 
-            </td>
+            </td>*@
             <td>
                 @Html.DisplayFor(modelItem => item.Date)
             </td>

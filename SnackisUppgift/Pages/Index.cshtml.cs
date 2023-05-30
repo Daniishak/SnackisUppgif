@@ -107,6 +107,7 @@ namespace SnackisUppgift.Pages
                 }
             }
 
+
             Post.Date = DateTime.Now;
             Post.Image = filename;
 

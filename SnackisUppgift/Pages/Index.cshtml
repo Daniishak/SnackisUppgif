@@ -99,8 +99,16 @@ else
         {
             <div class="card m-2" style="width: 60vw; max-width: 100%;">
                 <div class="card-img-container">
-                    <img class="card-img-top" src="~/img/@post.Image">
+                    @if (!string.IsNullOrEmpty(post.Image))
+                    {
+                        <img class="card-img-top" src="~/img/@post.Image">
+                    }
+                    else
+                    {
+                        <p>No image available for this post</p>
+                    }
                 </div>
+
                 <div class="card-body">
                     <div class="card-header-info d-flex justify-content-between align-items-center">
                         <p class="mb-0">@(!string.IsNullOrEmpty(post.PostedBy) ? post.PostedBy : "Anonym")</p>
