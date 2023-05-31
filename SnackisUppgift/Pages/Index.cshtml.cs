@@ -35,24 +35,37 @@ namespace SnackisUppgift.Pages
 
 
 
-		public async Task<IActionResult> OnGetAsync(int subjectId = 0, int deleteid = 0, bool showForm = false)
-		{
-			ShowForm = showForm;
+
+        public async Task<IActionResult> OnGetAsync(int subjectId = 0, int deleteid = 0, bool showForm = false)
+        {
+            ShowForm = showForm;
             Subjects = await DAL.SubjectManagerAPI.GetAllSubjects();
 
-            if (subjectId != 0 || subjectId != null)
-			{
-				Subject = await DAL.SubjectManagerAPI.GetSubject(subjectId);
-			}
+            if (subjectId > 0) // if subjectId is less than or equal to zero, it makes no sense to call GetSubject
+            {
+                Subject = await DAL.SubjectManagerAPI.GetSubject(subjectId);
+            }
 
-			// Get the logged in user
-			string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-			if (!string.IsNullOrEmpty(userId))
-			{
-				MyUser = await _userManager.FindByIdAsync(userId);
-			}
+            // Get the logged in user
+            string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (deleteid != 0)
+            if (!string.IsNullOrEmpty(userId))
+            {
+                MyUser = await _userManager.FindByIdAsync(userId);
+
+                // Set ProfilePicture if user has one
+                if (MyUser != null && MyUser.ProfilePicture != null) //ensure MyUser isn't null before checking ProfilePicture
+                {
+                    //Ensure Post object is not null
+                    if (Post == null)
+                    {
+                        Post = new Models.Post();
+                    }
+                    Post.ProfilePicture = MyUser.ProfilePicture;
+                }
+            }
+
+            if (deleteid > 0) // if deleteid is less than or equal to zero, it makes no sense to delete
             {
                 Models.Post blog = await _context.Post.FindAsync(deleteid);
 
@@ -62,7 +75,7 @@ namespace SnackisUppgift.Pages
                     var currentUser = await _userManager.GetUserAsync(User);
 
                     // Check if the current user is either an admin or the owner of the post
-                    if (User.IsInRole("Admin") || blog.UserName == currentUser.UserName ||User.IsInRole("Owner"))
+                    if (User.IsInRole("Admin") || (currentUser != null && blog.UserName == currentUser.UserName) || User.IsInRole("Owner"))
                     {
                         if (System.IO.File.Exists("./wwwroot/img/" + blog.Image))
                         {
@@ -82,28 +95,30 @@ namespace SnackisUppgift.Pages
                 }
             }
 
-
             // Sort posts in descending order based on the date
-            if (subjectId != 0)
-			{
-				Posts = await _context.Post
-					.Where(p => p.SubjectId == subjectId)
-					.OrderByDescending(p => p.Date)
-					.ToListAsync();
-			}
-			else
-			{
-				Posts = await _context.Post
-					.OrderByDescending(p => p.Date)
-					.ToListAsync();
-			}
+            if (subjectId > 0) // if subjectId is less than or equal to zero, it makes no sense to filter posts based on subjectId
+            {
+                Posts = await _context.Post
+                    .Where(p => p.SubjectId == subjectId)
+                    .OrderByDescending(p => p.Date)
+                    .ToListAsync();
+            }
+            else
+            {
+                Posts = await _context.Post
+                    .OrderByDescending(p => p.Date)
+                    .ToListAsync();
+            }
 
-			return Page();
-		}
+            return Page();
+        }
 
 
 
-		[HttpPost]
+
+
+
+        [HttpPost]
         [HttpPost]
         public async Task<IActionResult> OnPostAsync()
         {
@@ -124,19 +139,22 @@ namespace SnackisUppgift.Pages
                     await UploadedImage.CopyToAsync(filestream);
                 }
             }
+            var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             Post.Date = DateTime.Now;
             Post.Image = filename;
 
-            if (IsAnonymous)
+            if (IsAnonymous == true)
             {
                 Post.UserName = null;
             }
             else
             {
-                var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
                 Post.UserName = user.UserName;
-                ProfilePicture = user.ProfilePicture; // Add this line
+                if (user.ProfilePicture != null)
+                {
+                    Post.ProfilePicture = user.ProfilePicture; // Add this line
+                }
             }
 
             _context.Add(Post);
@@ -144,27 +162,6 @@ namespace SnackisUppgift.Pages
 
             return RedirectToPage("./Index");
         }
-
-        public IActionResult OnPostToggleForm(bool showForm)
-        {
-            ShowForm = !showForm;
-            return RedirectToPage(new { ShowForm });
-        }
-		public async Task<IActionResult> OnPostLikeAsync(int postId)
-{
-    var post = await _context.Post.FindAsync(postId);
-    if (post == null)
-    {
-        return NotFound();
-    }
-
-    post.Likes++; // Increment the likes count
-    await _context.SaveChangesAsync();
-
-    return new JsonResult(new { likes = post.Likes });
-}
-
-		
 
 	}
 }

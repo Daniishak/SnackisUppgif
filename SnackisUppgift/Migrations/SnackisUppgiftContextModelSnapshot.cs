@@ -294,10 +294,7 @@ namespace SnackisUppgift.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Likes")
-                        .HasColumnType("int");
-
-                    b.Property<string>("PostedBy")
+                    b.Property<string>("ProfilePicture")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SubjectId")

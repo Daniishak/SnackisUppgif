@@ -13,9 +13,9 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
+@*            <th>
                 @Html.DisplayNameFor(model => model.Post[0].Likes)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.Post[0].Comments)
             </th>
@@ -43,9 +43,9 @@
     <tbody>
 @foreach (var item in Model.Post) {
         <tr>
-            <td>
+@*            <td>
                 @Html.DisplayFor(modelItem => item.Likes)
-            </td>
+            </td>*@
             <td>
                 @Html.DisplayFor(modelItem => item.Comments)
             </td>

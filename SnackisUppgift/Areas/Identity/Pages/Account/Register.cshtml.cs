@@ -87,9 +87,6 @@ namespace SnackisUppgift.Areas.Identity.Pages.Account
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
-
-            [Display(Name = "Profilbild")]
-            public IFormFile ProfilePicture { get; set; }
             [Required]
             [Display(Name = "Förnamn")]
             public string FirstName { get; set; }
@@ -147,28 +144,6 @@ namespace SnackisUppgift.Areas.Identity.Pages.Account
                     
 
                 };
-
-
-                if (Input.ProfilePicture != null)
-                {
-                    var fileName = $"{Guid.NewGuid()}_{Input.ProfilePicture.FileName}";
-                    var fileDirectory = Path.Combine(_environment.WebRootPath, "Images");
-
-                    // Check if the directory exists, if not, create it.
-                    if (!Directory.Exists(fileDirectory))
-                    {
-                        Directory.CreateDirectory(fileDirectory);
-                    }
-
-                    var filePath = Path.Combine(fileDirectory, fileName);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await Input.ProfilePicture.CopyToAsync(stream);
-                    }
-
-                    user.ProfilePicture = fileName; // Save the name of the file into user data.
-                }
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
