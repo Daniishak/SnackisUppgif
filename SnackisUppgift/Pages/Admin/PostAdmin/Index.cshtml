@@ -37,6 +37,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.Post[0].UserName)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Post[0].Reports)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -68,6 +71,9 @@
             <td>
                 @Html.DisplayFor(modelItem => item.UserName)
             </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Reports)
+                </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |

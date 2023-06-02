@@ -1,4 +1,6 @@
-﻿<head>
+﻿@page
+@model SnackisUppgift.Pages.ReplyModel
+<head>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -69,20 +71,18 @@
 </head>
 
 <body>
-    <form method="post">
-        <div class="form-group">
-            <label for="email">Recipient Email</label>
-            <input id="email" name="email" class="form-control">
-        </div>
-        <div class="form-group">
-            <label for="replyContent">Your Reply</label>
-            <textarea id="replyContent" name="replyContent" class="form-control"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Send Reply</button>
-    </form>
     <div class="container">
         <h1>Reply to Message</h1>
 
+        <form method="post">
+            <input type="hidden" asp-for="OriginalMessage.Id" />
+            <input type="hidden" id="email" name="email" class="form-control" asp-for="OriginalMessage.Sender.Email">
+            <div class="form-group">
+                <label for="replyContent">Your Reply</label>
+                <textarea id="replyContent" name="replyContent" class="form-control"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Reply</button>
+        </form>
 
         <p>@Model.OriginalMessage.Message</p>
     </div>

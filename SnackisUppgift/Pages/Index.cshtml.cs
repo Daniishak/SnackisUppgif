@@ -222,30 +222,6 @@ namespace SnackisUppgift.Pages
             return RedirectToPage();
         }
 
-		//public async Task<IActionResult> OnPostPostReplyAsync(int postId, int parentCommentId, string text)
-		//{
-		//    var user = await _userManager.GetUserAsync(User);
-		//    var post = await _context.Post.FindAsync(postId);
-
-		//    if (user == null || post == null)
-		//    {
-		//        return BadRequest();
-		//    }
-
-		//    var reply = new Comment
-		//    {
-		//        Text = text,
-		//        DatePosted = DateTime.Now,
-		//        UserId = user.Id,
-		//        PostId = postId,
-		//        ParentCommentId = parentCommentId, // Set the parent comment id
-		//    };
-
-		//    _context.Comments.Add(reply);
-		//    await _context.SaveChangesAsync();
-
-		//    return RedirectToPage();
-		//}
 		public async Task<IActionResult> OnPostDeleteCommentAsync(int commentId)
 		{
 			var comment = await _context.Comments.FindAsync(commentId);
@@ -264,6 +240,56 @@ namespace SnackisUppgift.Pages
 
 			return RedirectToPage();
 		}
+		public async Task<IActionResult> OnPostReportPostAsync(int postId)
+		{
+			// Find the post that has been reported
+			var post = await _context.Post.FindAsync(postId);
+
+			// If the post doesn't exist, return an error
+			if (post == null)
+			{
+				return NotFound();
+			}
+
+			// Otherwise, increment the Reports count and save the changes
+			post.Reports++;
+			await _context.SaveChangesAsync();
+
+			return RedirectToPage();
+		}
+		public async Task<IActionResult> OnPostToggleLikeAsync(int postId)
+
+		{
+			var userId = _userManager.GetUserId(User);
+
+			var existingLike = await _context.PostLike
+				.FirstOrDefaultAsync(pl => pl.PostId == postId && pl.UserId == userId);
+
+			var post = await _context.Post.FindAsync(postId);
+			if (post == null)
+			{
+				return NotFound();
+			}
+
+			if (existingLike == null)
+			{
+				post.Likes++;
+				var newLike = new PostLike { PostId = postId, UserId = userId };
+				_context.PostLike.Add(newLike);
+			}
+			else
+			{
+				post.Likes--;
+				_context.PostLike.Remove(existingLike);
+			}
+
+			await _context.SaveChangesAsync();
+
+			return RedirectToPage();
+		}
+
+
+
 
 	}
 }

@@ -40,6 +40,7 @@ namespace SnackisUppgift.Pages
                     Message = dm.Message,
                     SentAt = dm.SentAt
                 })
+                .OrderByDescending(dm => dm.SentAt) // Add this line to sort the messages
                 .ToListAsync();
         }
 

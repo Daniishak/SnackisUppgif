@@ -183,6 +183,19 @@ else
 							<button type="submit" class="btn btn-primary">Delete</button>
 						</form>
 					}
+					<form method="post">
+						<input type="hidden" name="postId" value="@post.Id" />
+						<button type="submit" asp-page-handler="ReportPost">Report Post</button>
+					</form>
+
+					<form method="post">
+						<input type="hidden" name="postId" value="@post.Id" />
+						<button type="submit" class="btn btn-primary" asp-page-handler="ToggleLike">Like/Unlike Post</button>
+					</form>
+
+
+
+					<p>Likes: @post.Likes</p>
 
 					@if (User.Identity.IsAuthenticated)
 					{
@@ -228,16 +241,10 @@ else
 												</div>
 											</div>
 										}
-
-
 									}
-
-
 								</div>
 							</div>
-
 						</div>
-
 					}
 					else
 					{

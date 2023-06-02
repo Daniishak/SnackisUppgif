@@ -319,21 +319,24 @@ namespace SnackisUppgift.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Likes")
+                        .HasColumnType("int");
+
                     b.Property<string>("ProfilePicture")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Reports")
+                        .HasColumnType("int");
+
                     b.Property<int?>("SubjectId")
-                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserName")
@@ -344,6 +347,19 @@ namespace SnackisUppgift.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("Post");
+                });
+
+            modelBuilder.Entity("SnackisUppgift.Models.PostLike", b =>
+                {
+                    b.Property<int>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("PostId", "UserId");
+
+                    b.ToTable("PostLike");
                 });
 
             modelBuilder.Entity("SnackisUppgift.Models.Subject", b =>
@@ -459,9 +475,7 @@ namespace SnackisUppgift.Migrations
                 {
                     b.HasOne("SnackisUppgift.Models.Subject", "Subject")
                         .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SubjectId");
 
                     b.Navigation("Subject");
                 });
