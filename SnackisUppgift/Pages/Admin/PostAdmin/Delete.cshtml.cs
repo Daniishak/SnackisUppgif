@@ -45,22 +45,26 @@ namespace SnackisUppgift.Pages.Admin.PostAdmin
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync(int? id)
-        {
-            if (id == null || _context.Post == null)
-            {
-                return NotFound();
-            }
-            var post = await _context.Post.FindAsync(id);
+		public async Task<IActionResult> OnPostAsync()
+		{
+			var post = await _context.Post
+				.Include(p => p.Comments) // Include the comments in the query
+				.FirstOrDefaultAsync(p => p.Id == Post.Id);
 
-            if (post != null)
-            {
-                Post = post;
-                _context.Post.Remove(Post);
-                await _context.SaveChangesAsync();
-            }
+			if (post == null)
+			{
+				return NotFound();
+			}
 
-            return RedirectToPage("./Index");
-        }
-    }
+			// Remove the comments first
+			_context.Comments.RemoveRange(post.Comments);
+
+			// Remove the post
+			_context.Post.Remove(post);
+			await _context.SaveChangesAsync();
+
+			return RedirectToPage("./Index");
+		}
+
+	}
 }

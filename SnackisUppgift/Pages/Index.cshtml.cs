@@ -1,10 +1,17 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Build.Framework;
 using Microsoft.EntityFrameworkCore;
 using SnackisUppgift.Areas.Identity.Data;
 using SnackisUppgift.Models;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace SnackisUppgift.Pages
 {
@@ -18,13 +25,12 @@ namespace SnackisUppgift.Pages
             _context = context;
             _userManager = userManager;
         }
+
+        public ICollection<Comment> Comments { get; set; }
         public string ProfilePicture { get; set; }
-
         public List<Subject> Subjects { get; set; }
-
-		public Models.Subject Subject { get; set; }
-		public List<Models.Post> Posts { get; set; }
-
+        public Models.Subject Subject { get; set; }
+        public List<Models.Post> Posts { get; set; }
         [BindProperty]
         public Models.Post Post { get; set; }
         [BindProperty]
@@ -33,11 +39,14 @@ namespace SnackisUppgift.Pages
         public IFormFile UploadedImage { get; set; }
         public SnackisUppgiftUser MyUser { get; set; }
 
-
-
-
-        public async Task<IActionResult> OnGetAsync(int subjectId = 0, int deleteid = 0, bool showForm = false)
+        public async Task<IActionResult> OnGetAsync(int subjectId = 0, int postId = 0, int deleteid = 0, bool showForm = false)
         {
+            Comments = await _context.Comments
+                .Include(c => c.User)
+                .Include(c => c.ChildComments) // Load child comments
+                .Where(c => c.PostId == postId && c.ParentCommentId == null) // Only top-level comments
+                .ToListAsync();
+
             ShowForm = showForm;
             Subjects = await DAL.SubjectManagerAPI.GetAllSubjects();
 
@@ -110,58 +119,151 @@ namespace SnackisUppgift.Pages
                     .ToListAsync();
             }
 
+            // Fetch comments for each post
+            foreach (var post in Posts)
+            {
+                post.Comments = await _context.Comments
+                    .Include(c => c.User)
+                    .Include(c => c.ChildComments) // Load child comments
+                    .Where(c => c.PostId == post.Id && c.ParentCommentId == null) // Only top-level comments
+                    .ToListAsync();
+            }
+
             return Page();
         }
 
 
-
-
-
-
         [HttpPost]
-        [HttpPost]
-        public async Task<IActionResult> OnPostAsync()
+		public async Task<IActionResult> OnPostAsync()
+		{
+			if (!ModelState.IsValid)
+			{
+				// Reload subjects and return page to display validation errors.
+				Subjects = await DAL.SubjectManagerAPI.GetAllSubjects();
+				return Page();
+			}
+
+			string filename = string.Empty;
+			if (UploadedImage != null)
+			{
+				Random rnd = new();
+				filename = rnd.Next(0, 100000).ToString() + UploadedImage.FileName;
+				var file = "./wwwroot/img/" + filename;
+				using (var filestream = new FileStream(file, FileMode.Create))
+				{
+					await UploadedImage.CopyToAsync(filestream);
+				}
+			}
+			var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+			Post.Date = DateTime.Now;
+			Post.Image = filename;
+
+			if (IsAnonymous == true)
+			{
+				Post.UserName = null;
+			}
+			else
+			{
+				Post.UserName = user.UserName;
+				if (user.ProfilePicture != null)
+				{
+					Post.ProfilePicture = user.ProfilePicture;
+				}
+			}
+
+			_context.Add(Post);
+			await _context.SaveChangesAsync();
+
+			return RedirectToPage("./Index");
+		}
+
+		public async Task<IActionResult> OnPostDeleteAsync(int deleteId)
+		{
+			var post = await _context.Post.FindAsync(deleteId);
+			if (post == null)
+			{
+				return NotFound();
+			}
+
+			// Delete associated comments first
+			var comments = _context.Comments.Where(c => c.PostId == deleteId).ToList();
+			_context.Comments.RemoveRange(comments);
+
+			_context.Post.Remove(post);
+			await _context.SaveChangesAsync();
+
+			return RedirectToPage("./Index");
+		}
+
+
+
+		public async Task<IActionResult> OnPostPostCommentAsync(int postId, string text)
         {
-            if (!ModelState.IsValid)
+            var user = await _userManager.GetUserAsync(User);
+            var post = await _context.Post.FindAsync(postId);
+
+            if (user == null || post == null)
             {
-                // Reload subjects and return page to display validation errors.
-                return Page();
+                return BadRequest();
             }
 
-            string filename = string.Empty;
-            if (UploadedImage != null)
+            var comment = new Comment
             {
-                Random rnd = new();
-                filename = rnd.Next(0, 100000).ToString() + UploadedImage.FileName;
-                var file = "./wwwroot/img/" + filename;
-                using (var filestream = new FileStream(file, FileMode.Create))
-                {
-                    await UploadedImage.CopyToAsync(filestream);
-                }
-            }
-            var user = await _userManager.FindByIdAsync(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                Text = text,
+                DatePosted = DateTime.Now,
+                UserId = user.Id,
+                PostId = postId,
+            };
 
-            Post.Date = DateTime.Now;
-            Post.Image = filename;
-
-            if (IsAnonymous == true)
-            {
-                Post.UserName = null;
-            }
-            else
-            {
-                Post.UserName = user.UserName;
-                if (user.ProfilePicture != null)
-                {
-                    Post.ProfilePicture = user.ProfilePicture; // Add this line
-                }
-            }
-
-            _context.Add(Post);
+            _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
 
-            return RedirectToPage("./Index");
+            return RedirectToPage();
         }
+
+		//public async Task<IActionResult> OnPostPostReplyAsync(int postId, int parentCommentId, string text)
+		//{
+		//    var user = await _userManager.GetUserAsync(User);
+		//    var post = await _context.Post.FindAsync(postId);
+
+		//    if (user == null || post == null)
+		//    {
+		//        return BadRequest();
+		//    }
+
+		//    var reply = new Comment
+		//    {
+		//        Text = text,
+		//        DatePosted = DateTime.Now,
+		//        UserId = user.Id,
+		//        PostId = postId,
+		//        ParentCommentId = parentCommentId, // Set the parent comment id
+		//    };
+
+		//    _context.Comments.Add(reply);
+		//    await _context.SaveChangesAsync();
+
+		//    return RedirectToPage();
+		//}
+		public async Task<IActionResult> OnPostDeleteCommentAsync(int commentId)
+		{
+			var comment = await _context.Comments.FindAsync(commentId);
+
+			if (comment != null)
+			{
+				var currentUser = await _userManager.GetUserAsync(User);
+
+				// Kontrollera om den nuvarande användaren är antingen ägaren av inlägget eller en administratör/ägare
+				if (currentUser != null && (comment.UserId == currentUser.Id || User.IsInRole("Admin") || User.IsInRole("Owner")))
+				{
+					_context.Comments.Remove(comment);
+					await _context.SaveChangesAsync();
+				}
+			}
+
+			return RedirectToPage();
+		}
 
 	}
 }

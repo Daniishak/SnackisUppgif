@@ -238,6 +238,40 @@ namespace SnackisUppgift.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("SnackisUppgift.Models.Comment", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
+
+                    b.Property<DateTime?>("DatePosted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ParentCommentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentCommentId");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("SnackisUppgift.Models.DirectMessage", b =>
                 {
                     b.Property<int?>("Id")
@@ -280,9 +314,6 @@ namespace SnackisUppgift.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("Comments")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("Date")
                         .HasColumnType("datetime2");
@@ -385,6 +416,28 @@ namespace SnackisUppgift.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("SnackisUppgift.Models.Comment", b =>
+                {
+                    b.HasOne("SnackisUppgift.Models.Comment", "ParentComment")
+                        .WithMany("ChildComments")
+                        .HasForeignKey("ParentCommentId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("SnackisUppgift.Models.Post", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId");
+
+                    b.HasOne("SnackisUppgift.Areas.Identity.Data.SnackisUppgiftUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("ParentComment");
+
+                    b.Navigation("Post");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SnackisUppgift.Models.DirectMessage", b =>
                 {
                     b.HasOne("SnackisUppgift.Areas.Identity.Data.SnackisUppgiftUser", "Receiver")
@@ -418,6 +471,16 @@ namespace SnackisUppgift.Migrations
                     b.Navigation("MessagesReceived");
 
                     b.Navigation("MessagesSent");
+                });
+
+            modelBuilder.Entity("SnackisUppgift.Models.Comment", b =>
+                {
+                    b.Navigation("ChildComments");
+                });
+
+            modelBuilder.Entity("SnackisUppgift.Models.Post", b =>
+                {
+                    b.Navigation("Comments");
                 });
 #pragma warning restore 612, 618
         }

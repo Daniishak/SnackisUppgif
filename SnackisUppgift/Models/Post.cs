@@ -7,19 +7,13 @@ namespace SnackisUppgift.Models
     public class Post
     {
         public int Id { get; set; }
-        public int? Comments { get; set; }
         public string? Image { get; set; }
         public string? ProfilePicture { get; set; }
-
-        [Required(ErrorMessage = "Title is required.")]
         public string? Title { get; set; }
-
-        [Required(ErrorMessage = "Description is required.")]
         public string? Description { get; set; }
+        public ICollection<Comment>? Comments { get; set; }
 
         public virtual Subject? Subject { get; set; }  // Change to Subjects to match your new table
-
-        [Required(ErrorMessage = "Subject is required.")]
         public int? SubjectId { get; set; }
 
         public DateTime? Date { get; set; }

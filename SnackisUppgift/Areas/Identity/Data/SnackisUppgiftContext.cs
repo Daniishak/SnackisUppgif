@@ -15,7 +15,9 @@ public class SnackisUppgiftContext : IdentityDbContext<SnackisUppgiftUser>
     public DbSet<DirectMessage> DirectMessages { get; set; } = default!;
     public DbSet<SnackisUppgift.Models.Post> Post { get; set; } = default!;
     public DbSet<SnackisUppgift.Models.Subject> Subjects { get; set; } = default!;
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+	public DbSet<Comment> Comments { get; set; }
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
@@ -33,7 +35,12 @@ public class SnackisUppgiftContext : IdentityDbContext<SnackisUppgiftUser>
             .HasForeignKey(dm => dm.ReceiverId)
             .OnDelete(DeleteBehavior.Restrict);  // This prevents cascade delete
 
-        // Mapping Subject to the "Subjects" table
-        modelBuilder.Entity<SnackisUppgift.Models.Subject>().ToTable("Subjects");
+		modelBuilder.Entity<Comment>()
+				.HasOne(c => c.ParentComment)
+				.WithMany(c => c.ChildComments)
+				.HasForeignKey(c => c.ParentCommentId)
+				.OnDelete(DeleteBehavior.NoAction);
+		// Mapping Subject to the "Subjects" table
+		modelBuilder.Entity<SnackisUppgift.Models.Subject>().ToTable("Subjects");
     }
 }
