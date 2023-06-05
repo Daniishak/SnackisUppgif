@@ -362,6 +362,41 @@ namespace SnackisUppgift.Migrations
                     b.ToTable("PostLike");
                 });
 
+            modelBuilder.Entity("SnackisUppgift.Models.PostReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("PostId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId")
+                        .IsUnique()
+                        .HasFilter("[PostId] IS NOT NULL");
+
+                    b.ToTable("PostReport");
+                });
+
             modelBuilder.Entity("SnackisUppgift.Models.Subject", b =>
                 {
                     b.Property<int>("Id")
@@ -480,6 +515,15 @@ namespace SnackisUppgift.Migrations
                     b.Navigation("Subject");
                 });
 
+            modelBuilder.Entity("SnackisUppgift.Models.PostReport", b =>
+                {
+                    b.HasOne("SnackisUppgift.Models.Post", "Post")
+                        .WithOne("PostReport")
+                        .HasForeignKey("SnackisUppgift.Models.PostReport", "PostId");
+
+                    b.Navigation("Post");
+                });
+
             modelBuilder.Entity("SnackisUppgift.Areas.Identity.Data.SnackisUppgiftUser", b =>
                 {
                     b.Navigation("MessagesReceived");
@@ -495,6 +539,8 @@ namespace SnackisUppgift.Migrations
             modelBuilder.Entity("SnackisUppgift.Models.Post", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("PostReport");
                 });
 #pragma warning restore 612, 618
         }

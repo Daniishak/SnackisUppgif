@@ -22,25 +22,30 @@ namespace SnackisUppgift.Pages.Admin.PostAdmin
             _context = context;
         }
 
-      public Post Post { get; set; } = default!; 
+      public Post Post { get; set; } = default!;
+
+        public PostReport PostReport { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
-            if (id == null || _context.Post == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
             var post = await _context.Post.FirstOrDefaultAsync(m => m.Id == id);
-            if (post == null)
+            var postReport = await _context.PostReport.FirstOrDefaultAsync(pr => pr.PostId == id);
+
+            if (post == null || postReport == null)
             {
                 return NotFound();
             }
-            else 
-            {
-                Post = post;
-            }
+
+            Post = post;
+            PostReport = postReport;
+
             return Page();
         }
+
     }
 }

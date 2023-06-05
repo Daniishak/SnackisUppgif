@@ -20,6 +20,7 @@ namespace SnackisUppgift.Models
         public string? UserName { get; set; }
 		public int Reports { get; set; }
         public int Likes { get; set; }
+        public PostReport? PostReport { get; set; }
     }
 
 }

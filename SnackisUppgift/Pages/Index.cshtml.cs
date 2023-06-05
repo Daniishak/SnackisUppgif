@@ -240,23 +240,39 @@ namespace SnackisUppgift.Pages
 
 			return RedirectToPage();
 		}
-		public async Task<IActionResult> OnPostReportPostAsync(int postId)
+		public async Task<IActionResult> OnPostReportPostAsync(int postId, string category, string reason)
 		{
-			// Find the post that has been reported
 			var post = await _context.Post.FindAsync(postId);
 
-			// If the post doesn't exist, return an error
 			if (post == null)
 			{
 				return NotFound();
 			}
 
-			// Otherwise, increment the Reports count and save the changes
+			// Increment the Reports count for the post
 			post.Reports++;
+
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+			var postReport = new PostReport
+			{
+				PostId = postId,
+				Category = category,
+				Reason = reason,
+				UserId = userId,
+				CreatedDate = DateTime.Now
+			};
+
+			_context.PostReport.Add(postReport);
 			await _context.SaveChangesAsync();
 
 			return RedirectToPage();
 		}
+
+
+
+
+
 		public async Task<IActionResult> OnPostToggleLikeAsync(int postId)
 
 		{

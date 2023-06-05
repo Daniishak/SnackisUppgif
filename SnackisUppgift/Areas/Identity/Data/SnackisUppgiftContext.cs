@@ -16,7 +16,8 @@ public class SnackisUppgiftContext : IdentityDbContext<SnackisUppgiftUser>
     public DbSet<SnackisUppgift.Models.Post> Post { get; set; } = default!;
 	public DbSet<SnackisUppgift.Models.PostLike> PostLike { get; set; } = default!;
 	public DbSet<SnackisUppgift.Models.Subject> Subjects { get; set; } = default!;
-	public DbSet<Comment> Comments { get; set; }
+    public DbSet<SnackisUppgift.Models.PostReport> PostReport { get; set; } = default!;
+    public DbSet<Comment> Comments { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
@@ -48,6 +49,8 @@ public class SnackisUppgiftContext : IdentityDbContext<SnackisUppgiftUser>
 		// Defining a composite key for PostLike
 		modelBuilder.Entity<SnackisUppgift.Models.PostLike>()
 			.HasKey(pl => new { pl.PostId, pl.UserId });
+
+
 	}
 
 }
