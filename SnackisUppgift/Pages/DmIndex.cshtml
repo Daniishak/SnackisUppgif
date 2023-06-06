@@ -1,6 +1,26 @@
 ﻿@page
 @model SnackisUppgift.Pages.DmIndexModel
+<style>
+    body {
+        background-image: url('/Backgroundimages/SnowFoxes.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
 
+    .blurry-background::before {
+        content: "";
+        display: block;
+        position: fixed;
+        z-index: -1;
+        width: 100%;
+        height: 100%;
+        background: inherit;
+        filter: blur(5px);
+        transform: scale(1.1);
+    }
+</style>
+<body class="blurry-background">
 <div class="container">
     <h1 class="mt-5 mb-4">Your Direct Messages</h1>
 
@@ -47,3 +67,4 @@
         </div>
     </div>
 </div>
+</body>

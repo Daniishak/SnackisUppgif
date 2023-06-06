@@ -214,6 +214,7 @@ namespace SnackisUppgift.Pages
                 DatePosted = DateTime.Now,
                 UserId = user.Id,
                 PostId = postId,
+                ProfilePicture = user.ProfilePicture
             };
 
             _context.Comments.Add(comment);

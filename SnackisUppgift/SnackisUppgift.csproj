@@ -22,6 +22,7 @@
     <Folder Include="Pages\Roles\" />
     <Folder Include="wwwroot\img\" />
     <Folder Include="wwwroot\Images\" />
+    <Folder Include="wwwroot\Backgroundimages\" />
   </ItemGroup>
 
 </Project>

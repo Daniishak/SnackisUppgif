@@ -3,7 +3,27 @@
 @{
     ViewData["Title"] = "Register";
 }
+<style>
+    body {
+        background-image: url('/Backgroundimages/SnowFoxes.png');
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
 
+    .blurry-background::before {
+        content: "";
+        display: block;
+        position: fixed;
+        z-index: -1;
+        width: 100%;
+        height: 100%;
+        background: inherit;
+        filter: blur(5px);
+        transform: scale(1.1);
+    }
+</style>
+<body class="blurry-background">
 <h1>@ViewData["Title"]</h1>
 
 <div class="row">
@@ -85,3 +105,4 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+</body>
